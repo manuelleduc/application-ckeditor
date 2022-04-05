@@ -33,6 +33,7 @@ define('imageEditor', ['jquery', 'modal', 'xwiki-skinx'], function($, $modal) {
     });
   }
 
+  // Fetch modal content from a remote template the first time the image dialog editor is opened.
   function initialize(modal) {
     var params = modal.data('input');
     if (!modal.data('initialized')) {
@@ -57,6 +58,49 @@ define('imageEditor', ['jquery', 'modal', 'xwiki-skinx'], function($, $modal) {
     }
   }
 
+  // Update the form according to the modal input data.
+  // 
+  function updateForm(modal) {
+    var macroData = modal.data('input').macroData || {};
+
+    // Switch back to the default tab
+    $('.image-editor a[href="#standard"]').tab('show');
+
+    // Style
+    console.log('macroData.imageStyle', macroData.imageStyle);
+    if (macroData.imageStyle) {
+      $('#imageStyles').selectize()[0].selectize.setValue(macroData.imageStyle);
+    }
+
+    // Alt
+    $('#altText').val(macroData.alt);
+
+
+    // Caption
+    $('#imageCaptionActivation').prop('checked', macroData.hasCaption);
+    if (macroData.hasCaption) {
+      $('#imageCaption').val(macroData.imageCaption);
+      $('#imageCaption').prop('disabled', false);
+    } else {
+      $('#imageCaption').val('');
+      $('#imageCaption').prop('disabled', true);
+    }
+
+    // Image size
+    $('#imageWidth').val(macroData.width);
+    $('#imageHeight').val(macroData.height);
+
+    // Border
+    $('#imageBorder').prop('checked', macroData.border);
+
+    // Alignment
+    $('#advanced [name="alignment"]').val(macroData.alignment);
+
+    // Text Wrap
+    $('#advanced [name="textWrap"]').prop('checked', macroData.textWrap);
+
+  }
+
   return $modal.createModalStep({
     'class': 'image-editor-modal',
     title: 'TITLE', // TODO: translation
@@ -70,21 +114,25 @@ define('imageEditor', ['jquery', 'modal', 'xwiki-skinx'], function($, $modal) {
 
       modal.on('shown.bs.modal', function() {
         initialize(modal);
+        updateForm(modal);
       });
       insertButton.on('click', function() {
         // TODO: complete output with the selected settings.
-        var resourceReference = modal.data('input').imageReference;
+        var resourceReference = modal.data('input').macroData.resourceReference;
         var output = {
           resourceReference: resourceReference,
-          // classes: [$("#imageStyles").val()],
-          align: undefined, // TODO - complete the classes with values from the advanced pane 
+          imageStyle: $('#imageStyles').val(),
+          alignment: $('#advanced [name="alignment"]').val(),
+          border: $('#advanced [name="imageBorder"]').is(':checked'),
+          textWrap: $('#advanced [name="textWrap"]').is(':checked'),
           alt: $('#altText').val(),
-          hasCaption: $("#imageCaptionActivation").val() === 'on',
+          hasCaption: $("#imageCaptionActivation").is(':checked'),
+          imageCaption: $("#imageCaption").val(),
           width: $("#imageWidth").val(),
           height: $("#imageHeight").val(),
-          src: CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, modal.data('input').editor), // TODO?
-          'data-test': 'OK'
+          src: CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, modal.data('input').editor)
         };
+        console.log('OUTPUT', output);
         modal.data('output', output).modal('hide');
       });
 

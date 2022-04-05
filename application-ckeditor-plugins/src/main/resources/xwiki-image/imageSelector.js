@@ -143,9 +143,14 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'xwiki-skinx'], function
         initialize(modal);
       });
       selectButton.on('click', function() {
-        // TODO: complete output with the selected image.
+        var macroData = modal.data('input').macroData || {};
+        macroData.resourceReference = modal.data('imageReference').value;
+        if (macroData.resourceReference) {
+          // FIXME: this is probably not necessary! But is does fix the issue.
+          macroData.resourceReference.typed = false;
+        }
         var output = {
-          imageReference: modal.data('imageReference').value,
+          macroData: macroData,
           editor: modal.data('input').editor
         };
         modal.data('output', output).modal('hide');
