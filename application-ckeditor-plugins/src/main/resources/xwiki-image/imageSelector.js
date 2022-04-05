@@ -52,9 +52,7 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'xwiki-skinx'], function
       var loader = editor.uploadRepository.create($("#fileUploadField").prop('files')[0]);
       loader.on('uploaded', function(evt) {
         var resourceReference = evt.sender.responseData.message.resourceReference;
-        var entityReference = resource.convertResourceReferenceToEntityReference(resourceReference);
-        var serialized = XWiki.Model.serialize(entityReference);
-        saveSelectedImageReference(serialized, modal);
+        saveSelectedImageReference(resourceReference, modal);
         // TODO: show success and stop spinner
       });
 
@@ -74,8 +72,17 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'xwiki-skinx'], function
     });
   }
 
+  function getEntityReference(reference) {
+    var separatorIndex = reference.indexOf(':');
+    var nodeType = reference.substr(0, separatorIndex);
+    var nodeStringReference = reference.substr(separatorIndex + 1);
+    return XWiki.Model.resolve(nodeStringReference, XWiki.EntityType.byName(nodeType));
+  }
+
   function saveSelectedImageReference(imageReference, modal) {
-    modal.data('imageReference', {value: imageReference});
+    modal.data('imageReference', {
+      value: resource.convertEntityReferenceToResourceReference(getEntityReference(imageReference))
+    });
     $('.image-selector-modal button.btn-primary').prop('disabled', false);
   }
 
@@ -88,8 +95,8 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'xwiki-skinx'], function
     var params = modal.data('input');
 
     if (!modal.data('initialized')) {
-      // TODO: start by a single document tree (and simple file uploader?), then move toward a modular approach to
-      //  load pane according to an UIX.
+      // TODO: start by a single document tree and file upload, then move toward a modular approach to load pane 
+      //  according to an UIX. The main difficulty is to allow UIXs to send their attachments back to the form.
       var url = new XWiki.Document(XWiki.Model.resolve('CKEditor.ImageSelectorService', XWiki.EntityType.DOCUMENT))
         .getURL('get');
       $.get(url, $.param({language: $('html').attr('lang')}))

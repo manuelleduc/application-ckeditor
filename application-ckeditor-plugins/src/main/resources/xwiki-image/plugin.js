@@ -19,7 +19,7 @@
  */
 (function() {
   'use strict';
-  
+
   function showImageWizard(editor, widget) {
     require(['imageWizard'], function(imageWizard) {
       var resourceReference;
@@ -28,42 +28,39 @@
       }
       imageWizard({
         editor: editor,
-        resourceReference: resourceReference
+        resourceReference: resourceReference,
+        macroData: widget.data
       }).done(function(data) {
         // TODO: Find out how to insert a widget. Compare with xwiki-macro... 
-        widget.setData(data);
+        if (widget && widget.element) {
+          widget.setData(data);
+        } else {
+          var element = CKEDITOR.dom.element.createFromHtml(widget.template.output(), editor.document);
+          var wrapper = editor.widgets.wrapElement(element, widget.name);
+          var temp = new CKEDITOR.dom.documentFragment(wrapper.getDocument());
+
+          // Append wrapper to a temporary document. This will unify the environment in which #data listeners work when
+          // creating and editing widget.
+          temp.append(wrapper);
+
+          editor.widgets.initOn(element, widget, data);
+          editor.widgets.finalizeCreation(temp);
+        }
       });
     });
   }
 
   CKEDITOR.plugins.add('xwiki-image', {
     requires: 'xwiki-image-old',
-    beforeInit: function(editor) {
-      editor.on('widgetDefinition', function(event) {
-        var widgetDefinition = event.data;
-        if (widgetDefinition.name === "image" && widgetDefinition.dialog === "image2") {
-          this.overrideImageWidget(editor, widgetDefinition);
-        }
-      }, this);
-    },
     init: function(editor) {
       this.initImageDialogWidget(editor);
     },
     initImageDialogWidget: function(editor) {
       var imagePlugin = this;
       var imageWidget = editor.widgets.registered.image;
+      this.overrideImageWidget(editor, imageWidget);
+      
       imageWidget.insert = function() {
-        var element = CKEDITOR.dom.element.createFromHtml(this.template.output(), editor.document);
-        var wrapper = editor.widgets.wrapElement(element, imageWidget.name);
-        var temp = new CKEDITOR.dom.documentFragment(wrapper.getDocument());
-
-        // Append wrapper to a temporary document. This will unify the environment
-        // in which #data listeners work when creating and editing widget.
-        temp.append(wrapper);
-        
-        // TODO: find out how to insert a widget. And to set the datas!
-        editor.widgets.initOn(element, imageWidget);
-
         showImageWizard(editor, this);
       };
       imageWidget.edit = function(event) {
@@ -73,9 +70,27 @@
       };
     },
     overrideImageWidget: function(editor, imageWidget) {
+      CKEDITOR.plugins.registered['xwiki-image-old'].overrideImageWidget(editor, imageWidget);
+
       var originalInit = imageWidget.init;
       imageWidget.init = function() {
         originalInit.call(this);
+        // var imageCaption = this.parts.figure.figcaption
+        // var serializedResourceReference = this.parts.image.getAttribute('data-reference');
+        // if (serializedResourceReference) {
+        //   this.setData('resourceReference', CKEDITOR.plugins.xwikiResource
+        //     .parseResourceReference(serializedResourceReference));
+        // }
+      };
+
+      var originalData = imageWidget.data;
+      imageWidget.data = function() {
+        var resourceReference = this.data.resourceReference;
+        // if (resourceReference) {
+        //   this.parts.image.setAttribute('data-reference', CKEDITOR.plugins.xwikiResource
+        //     .serializeResourceReference(resourceReference));
+        // }
+        // originalData.call(this);
       };
     }
   });

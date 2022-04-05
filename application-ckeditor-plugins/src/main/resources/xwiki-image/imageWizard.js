@@ -31,18 +31,12 @@ define('imageWizard', ['imageSelector', 'imageEditor'], function(imageSelector, 
   }
 
   function editOnly(params) {
-    return imageEditor({
-      editor: params.editor,
-      resourceReference: params.resourceReference
-    })
+    return imageEditor(params)
       .then(backToSelectionOrFinish);
   }
 
   function editAndSelect(params) {
-    return imageSelector({
-      editor: params.editor,
-      resourceReference: undefined
-    })
+    return imageSelector(params)
       .then(imageEditor)
       .then(backToSelectionOrFinish);
   }

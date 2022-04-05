@@ -73,15 +73,17 @@ define('imageEditor', ['jquery', 'modal', 'xwiki-skinx'], function($, $modal) {
       });
       insertButton.on('click', function() {
         // TODO: complete output with the selected settings.
+        var resourceReference = modal.data('input').imageReference;
         var output = {
-          resourceReference: modal.data('input').imageReference,
-          classes: [$("#imageStyles").val()],
+          resourceReference: resourceReference,
+          // classes: [$("#imageStyles").val()],
           align: undefined, // TODO - complete the classes with values from the advanced pane 
           alt: $('#altText').val(),
           hasCaption: $("#imageCaptionActivation").val() === 'on',
           width: $("#imageWidth").val(),
           height: $("#imageHeight").val(),
-          src: '' // TODO?
+          src: CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, modal.data('input').editor), // TODO?
+          'data-test': 'OK'
         };
         modal.data('output', output).modal('hide');
       });
