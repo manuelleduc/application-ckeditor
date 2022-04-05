@@ -22,9 +22,7 @@ define('imageWizard', ['imageSelector', 'imageEditor'], function(imageSelector, 
 
   function backToSelectionOrFinish(data) {
     if (data.action === 'selectImage') {
-      return editAndSelect({
-        editor: data.editor
-      });
+      return editAndSelect(data);
     } else {
       return data;
     }

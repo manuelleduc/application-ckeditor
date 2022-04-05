@@ -21,14 +21,61 @@
 define('imageEditor', ['jquery', 'modal', 'xwiki-skinx'], function($, $modal) {
   'use strict';
 
+
+  function initImageStyleField(cb) {
+    var imageStylesField = $('#imageStyles');
+    if (imageStylesField) {
+      const restURL = `${XWiki.contextPath}/rest/wikis/${XWiki.currentWiki}/imageStyles`;
+      $.getJSON(`${restURL}/default`,
+        $.param({'documentReference': XWiki.Model.serialize(XWiki.currentDocument.documentReference)}))
+        .done((defaultStyle) => {
+          var settings = {
+            preload: true,
+            load: function(typedText, callback) {
+              $.getJSON(restURL).done((values) => {
+                console.log('>>>', values);
+                const imageStyles = values.imageStyles.map((value) => ({
+                  label: value.prettyName,
+                  value: value.identifier
+                }));
+                callback(imageStyles);
+                console.log(defaultStyle, 'POUET');
+                // Sets the default value once the values are loaded.
+                imageStylesField.data('selectize').addItem(defaultStyle.defaultStyle);
+                cb();
+
+              }).fail(callback);
+            }
+          };
+
+          imageStylesField.xwikiSelectize(settings);
+        }).fail((...args) => {
+        // TODO
+        console.log('fail', args);
+      });
+    }
+  }
+
+  function initCaptionField() {
+    const activation = $('#imageCaptionActivation');
+    if (activation) {
+      activation.change(function() {
+        $("#imageCaption").prop('disabled', !this.checked);
+      });
+    }
+  }
+
   function addChangeImageButton(insertButton, modal) {
     var selectImageButton = $('<button type="button" class="btn btn-default pull-left"></button>')
       .text('TODO Back')
       .prependTo(insertButton.parent());
     selectImageButton.on('click', function() {
+      var macroData = getFormData(modal);
+      console.log('macroData back to selector', macroData)
       modal.data('output', {
         action: 'selectImage',
-        editor: modal.data('input').editor
+        editor: modal.data('input').editor,
+        macroData: macroData
       }).modal('hide');
     });
   }
@@ -49,13 +96,39 @@ define('imageEditor', ['jquery', 'modal', 'xwiki-skinx'], function($, $modal) {
           $(params.editor.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
           imageEditor.html(html);
           imageEditor.removeClass('loading');
-          modal.data('initialized', true);
-          $('.image-editor-modal button.btn-primary').prop('disabled', false);
+          initCaptionField();
+          initImageStyleField(function() {
+            modal.data('initialized', true);
+            $('.image-editor-modal button.btn-primary').prop('disabled', false);
+            updateForm(modal);
+          });
+
+
         }).fail(function() {
         // TODO: deal with error handling.
         modal.data('initialized', true);
       });
+    } else {
+      updateForm(modal);
     }
+  }
+
+  function getFormData(modal) {
+    var resourceReference = modal.data('input').macroData.resourceReference;
+    var output = {
+      resourceReference: resourceReference,
+      imageStyle: $('#imageStyles').val(),
+      alignment: $('#advanced [name="alignment"]').val(),
+      border: $('#advanced [name="imageBorder"]').is(':checked'),
+      textWrap: $('#advanced [name="textWrap"]').is(':checked'),
+      alt: $('#altText').val(),
+      hasCaption: $("#imageCaptionActivation").is(':checked'),
+      imageCaption: $("#imageCaption").val(),
+      width: $("#imageWidth").val(),
+      height: $("#imageHeight").val(),
+      src: CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, modal.data('input').editor)
+    };
+    return output;
   }
 
   // Update the form according to the modal input data.
@@ -68,8 +141,8 @@ define('imageEditor', ['jquery', 'modal', 'xwiki-skinx'], function($, $modal) {
 
     // Style
     console.log('macroData.imageStyle', macroData.imageStyle);
-    if (macroData.imageStyle) {
-      $('#imageStyles').selectize()[0].selectize.setValue(macroData.imageStyle);
+    if(macroData.imageStyle) {
+      $('#imageStyles')[0].selectize.setValue(macroData.imageStyle);
     }
 
     // Alt
@@ -78,7 +151,7 @@ define('imageEditor', ['jquery', 'modal', 'xwiki-skinx'], function($, $modal) {
 
     // Caption
     $('#imageCaptionActivation').prop('checked', macroData.hasCaption);
-    if (macroData.hasCaption) {
+    if(macroData.hasCaption) {
       $('#imageCaption').val(macroData.imageCaption);
       $('#imageCaption').prop('disabled', false);
     } else {
@@ -114,25 +187,9 @@ define('imageEditor', ['jquery', 'modal', 'xwiki-skinx'], function($, $modal) {
 
       modal.on('shown.bs.modal', function() {
         initialize(modal);
-        updateForm(modal);
       });
       insertButton.on('click', function() {
-        // TODO: complete output with the selected settings.
-        var resourceReference = modal.data('input').macroData.resourceReference;
-        var output = {
-          resourceReference: resourceReference,
-          imageStyle: $('#imageStyles').val(),
-          alignment: $('#advanced [name="alignment"]').val(),
-          border: $('#advanced [name="imageBorder"]').is(':checked'),
-          textWrap: $('#advanced [name="textWrap"]').is(':checked'),
-          alt: $('#altText').val(),
-          hasCaption: $("#imageCaptionActivation").is(':checked'),
-          imageCaption: $("#imageCaption").val(),
-          width: $("#imageWidth").val(),
-          height: $("#imageHeight").val(),
-          src: CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, modal.data('input').editor)
-        };
-        console.log('OUTPUT', output);
+        var output = getFormData(modal);
         modal.data('output', output).modal('hide');
       });
 
