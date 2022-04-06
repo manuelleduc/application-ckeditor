@@ -52,8 +52,10 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'xwiki-skinx'], function
       var loader = editor.uploadRepository.create($("#fileUploadField").prop('files')[0]);
       loader.on('uploaded', function(evt) {
         var resourceReference = evt.sender.responseData.message.resourceReference;
-        saveSelectedImageReference(resourceReference, modal);
-        // TODO: show success and stop spinner
+        var entityReference = resource.convertResourceReferenceToEntityReference(resourceReference);
+        var serialized = XWiki.Model.serialize(entityReference);
+        saveSelectedImageReference(serialized, modal);
+        // TODO: show success and stop spinner and cleanup upload field.
       });
 
       // Return non-false value will disable fileButton in dialogui,
@@ -143,17 +145,18 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'xwiki-skinx'], function
         initialize(modal);
       });
       selectButton.on('click', function() {
-        console.log('after click',modal.data('input'));
+        console.log('after click', modal.data('input'));
         var macroData = modal.data('input').macroData || {};
-        macroData.resourceReference = modal.data('imageReference').value
-        if(macroData.resourceReference) {
+        macroData.resourceReference = modal.data('imageReference').value;
+        if (macroData.resourceReference) {
           // FIXME: this is probably not necessary! But is does fix the issue.
           macroData.resourceReference.typed = false;
         }
         console.log('macroData out selector', macroData);
         var output = {
           macroData: macroData,
-          editor: modal.data('input').editor
+          editor: modal.data('input').editor,
+          newImage: modal.data('input').newImage
         };
         modal.data('output', output).modal('hide');
       });

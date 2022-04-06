@@ -22,7 +22,7 @@ define('imageWizard', ['imageSelector', 'imageEditor'], function(imageSelector, 
 
   function backToSelectionOrFinish(data) {
     if (data.action === 'selectImage') {
-      return editAndSelect(data);
+      return selectAndEdit(data);
     } else {
       return data;
     }
@@ -33,7 +33,9 @@ define('imageWizard', ['imageSelector', 'imageEditor'], function(imageSelector, 
       .then(backToSelectionOrFinish);
   }
 
-  function editAndSelect(params) {
+  function selectAndEdit(params) {
+    params = params || {};
+    params.newImage = true;
     return imageSelector(params)
       .then(imageEditor)
       .then(backToSelectionOrFinish);
@@ -43,7 +45,7 @@ define('imageWizard', ['imageSelector', 'imageEditor'], function(imageSelector, 
     if (params.macroData && params.macroData.resourceReference) {
       return editOnly(params);
     } else {
-      return editAndSelect(params);
+      return selectAndEdit(params);
     }
   };
 });
