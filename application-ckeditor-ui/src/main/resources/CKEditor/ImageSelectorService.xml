@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -28,7 +27,7 @@
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1648816214000</creationDate>
-  <parent>xwiki:CKEditor.WebHome</parent>
+  <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1648827273000</date>
@@ -53,7 +52,6 @@
   &lt;!-- Nav tabs --&gt;
   &lt;ul class="nav nav-tabs" role="tablist"&gt;
     &lt;li role="presentation" class="active"&gt;&lt;a href="#documentTree" aria-controls="documentTree" role="tab" data-toggle="tab"&gt;TODO Document Tree&lt;/a&gt;&lt;/li&gt;
-    &lt;!--&lt;li role="presentation"&gt;&lt;a href="#search" aria-controls="search" role="tab" data-toggle="tab"&gt;TOOD Searcj&lt;/a&gt;&lt;/li&gt;--&gt;
     &lt;li role="presentation"&gt;&lt;a href="#upload" aria-controls="upload" role="tab" data-toggle="tab"&gt;TODO Upload&lt;/a&gt;&lt;/li&gt;
   &lt;/ul&gt;
 
@@ -69,7 +67,6 @@
         'showTranslations': false
       })
     &lt;/div&gt;
-    &lt;!--&lt;div role="tabpanel" class="tab-pane" id="search"&gt;TODO&lt;/div&gt;--&gt;
     &lt;div role="tabpanel" class="tab-pane" id="upload"&gt;
       &lt;form class="xform"&gt;
         &lt;dl&gt;

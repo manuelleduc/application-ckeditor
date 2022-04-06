@@ -62,11 +62,9 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'xwiki-skinx'], function
       // below listeners takes care of such situation and re-enable "send" button.
       loader.on('error', function() {
         // TODO: show error and stop spinner
-        console.log('TODO error', arguments);
       });
       loader.on('abort', function() {
         // TODO: show error and stop spinner
-        console.log('TODO abort', arguments);
       });
 
       // TODO: show spinner
@@ -145,14 +143,12 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'xwiki-skinx'], function
         initialize(modal);
       });
       selectButton.on('click', function() {
-        console.log('after click', modal.data('input'));
         var macroData = modal.data('input').macroData || {};
         macroData.resourceReference = modal.data('imageReference').value;
         if (macroData.resourceReference) {
           // FIXME: this is probably not necessary! But is does fix the issue.
           macroData.resourceReference.typed = false;
         }
-        console.log('macroData out selector', macroData);
         var output = {
           macroData: macroData,
           editor: modal.data('input').editor,

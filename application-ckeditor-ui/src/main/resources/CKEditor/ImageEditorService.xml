@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -28,11 +27,11 @@
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1648816215000</creationDate>
-  <parent>xwiki:CKEditor.WebHome</parent>
+  <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1648828843000</date>
-  <contentUpdateDate>1648828822000</contentUpdateDate>
+  <date>1649255194000</date>
+  <contentUpdateDate>1649255194000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -49,7 +48,7 @@
 {{velocity}}
 ##
 ## Expected request parameters:
-## - reference of the image
+## - isHTML5: true when htm5 is supported
 ##
 ## Check if the default image styles are available.
 #if ($services.component.getInstance('org.xwiki.rest.XWikiRestComponent', 'org.xwiki.image.style.rest.internal.DefaultImageStylesResource'))
@@ -70,8 +69,8 @@
   &lt;div class="tab-content"&gt;
     &lt;div role="tabpanel" class="tab-pane active" id="standard"&gt;
      &lt;form class="xform"&gt;
-     #if ($defaultImageStylesActive)
-       &lt;dl&gt;
+     &lt;dl&gt;
+       #if ($defaultImageStylesActive)
         &lt;dt&gt;
           &lt;label for="imageStyles"&gt;TODO Image Styles&lt;/label&gt;
           &lt;span class="xHint"&gt;TODO Select the style to apply on the image.&lt;/span&gt;
@@ -82,9 +81,7 @@
           #set ($discard = $xwiki.jsx.use('CKEditor.ImageEditorService'))
           &lt;select id="imageStyles"&gt;&lt;/select&gt;
         &lt;/dd&gt;
-      &lt;/dl&gt;
-     #end
-       &lt;dl&gt;
+       #end
         &lt;dt&gt;
           &lt;label for="altText"&gt;TODO Alternative Text&lt;/label&gt;
           &lt;span class="xHint"&gt;TODO Define an alternate text for an image, if the image cannot be displayed.&lt;/span&gt;
@@ -92,8 +89,7 @@
         &lt;dd&gt;
           &lt;input id="altText" name="altText" value="" type="text" /&gt;
         &lt;/dd&gt;
-      &lt;/dl&gt;
-      &lt;dl&gt;
+        #if ("${request.isHTML5}" == 'true')
         &lt;dt&gt;
           &lt;label for="imageCaption"&gt;TODO Caption&lt;/label&gt;
           &lt;span class="xHint"&gt;TODO Activate and define an image caption.&lt;/span&gt;
@@ -106,29 +102,44 @@
             &lt;input type="text" class="form-control" aria-label="Image caption text input" id="imageCaption" name="imageCaption" disabled/&gt;
           &lt;/div&gt;&lt;!-- /input-group --&gt;
         &lt;/dd&gt;
+        #end
       &lt;/dl&gt;
      &lt;/form&gt;
     &lt;/div&gt;
     &lt;div role="tabpanel" class="tab-pane" id="advanced"&gt;
       &lt;form class="xform"&gt;
         &lt;dl&gt;
+          &lt;dt&gt;
+            &lt;label &gt;TODO Size&lt;/label&gt;
+            &lt;span class="xHint"&gt;TODO Define the image size.&lt;/span&gt;
+          &lt;/dt&gt;
           &lt;dd&gt;
-          &lt;label for="imageAlignment"&gt;TODO Alignment&lt;/label&gt;
-          &lt;span class="xHint"&gt;TODO Define the image alignment.&lt;/span&gt;
+            &lt;label&gt;Width &lt;input type="number" name="imageWidth" id="imageWidth" /&gt;&lt;/label&gt;
+            &lt;label&gt;Height &lt;input type="number" name="imageHeight" id="imageHeight" /&gt;&lt;/label&gt;
           &lt;/dd&gt;
           &lt;dt&gt;
-          &lt;div class="btn-group" data-toggle="buttons"&gt;
-  &lt;label class="btn btn-primary active"&gt;
-    &lt;input type="radio" name="options" id="option1" checked&gt; Radio 1 (preselected)
-  &lt;/label&gt;
-  &lt;label class="btn btn-primary"&gt;
-    &lt;input type="radio" name="options" id="option2"&gt; Radio 2
-  &lt;/label&gt;
-  &lt;label class="btn btn-primary"&gt;
-    &lt;input type="radio" name="options" id="option3"&gt; Radio 3
-  &lt;/label&gt;
-&lt;/div&gt;
+            &lt;label for="imageBorder"&gt;TODO Border&lt;/label&gt;
+            &lt;span class="xHint"&gt;TODO When checked, the image is displayed with a border&lt;/span&gt;
           &lt;/dt&gt;
+          &lt;dd&gt;
+            &lt;input type="checkbox" name="imageBorder" id="imageBorder" /&gt;
+          &lt;/dd&gt;
+          &lt;dt&gt;
+            &lt;label for="imageAlignment"&gt;TODO Alignment&lt;/label&gt;
+            &lt;span class="xHint"&gt;TODO Define the image alignment.&lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;
+            &lt;label&gt;&lt;input type="radio" name="alignment" value="left" checked&gt; TODO Left&lt;/label&gt;
+            &lt;label&gt;&lt;input type="radio" name="alignment" value="center"&gt; TODO Center&lt;/label&gt;
+            &lt;label&gt;&lt;input type="radio" name="alignment" value="right"&gt; TODO Right&lt;/label&gt;
+          &lt;/dd&gt;
+          &lt;dt&gt;
+            &lt;label for="textWrap"&gt;TODO Text Wrap&lt;/label&gt;
+            &lt;span class="xHint"&gt;TODO When checked, the image is wraped around the surounding text.&lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;
+            &lt;input type="checkbox" name="textWrap" id="textWrap" /&gt;
+          &lt;/dd&gt;
         &lt;/dl&gt;
       &lt;/form&gt;
     &lt;/div&gt;
@@ -144,154 +155,4 @@
 #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
 #end
 {{/velocity}}</content>
-  <object>
-    <name>CKEditor.ImageEditorService</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>89a52b10-7174-4b14-b44b-1b3a0aa51548</guid>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <defaultValue>long</defaultValue>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>require.config({
-  paths: {
-    'xwiki-selectize': "$xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)" +
-      "?v=$escapetool.url($xwiki.version)"
-  }
-});
-
-require(['jquery', 'xwiki-selectize'], function ($) {
-
-  function initImageStyleField() {
-    var imageStylesField = $('#imageStyles');
-    if (imageStylesField) {
-      const restURL = `${XWiki.contextPath}/rest/wikis/${XWiki.currentWiki}/imageStyles`;
-      $.getJSON(`${restURL}/default`,
-        $.param({'documentReference': XWiki.Model.serialize(XWiki.currentDocument.documentReference)}))
-        .done((defaultStyle) =&gt; {
-          var settings = {
-            preload: true,
-            load: function (typedText, callback) {
-              $.getJSON(restURL).done((values) =&gt; {
-                console.log('&gt;&gt;&gt;', values);
-                const imageStyles = values.imageStyles.map((value) =&gt; ({
-                  label: value.prettyName,
-                  value: value.identifier
-                }));
-                callback(imageStyles);
-                console.log(defaultStyle, 'POUET');
-                // Sets the default value once the values are loaded.
-                imageStylesField.data('selectize').addItem(defaultStyle.defaultStyle);
-              }).fail(callback);
-            }
-          };
-
-          imageStylesField.xwikiSelectize(settings);
-        }).fail((...args) =&gt; {
-        // TODO
-        console.log('fail', args);
-      });
-    }
-  }
-
-  function initCaptionField() {
-    $('#imageCaptionActivation').change(function() {
-      console.log('CHANGE', arguments);
-      $("#imageCaption").prop('disabled', !this.checked)
-    });
-  }
-
-  initImageStyleField();
-  initCaptionField();
-
-});</code>
-    </property>
-    <property>
-      <name/>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
 </xwikidoc>

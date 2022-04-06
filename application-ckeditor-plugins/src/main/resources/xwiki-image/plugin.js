@@ -26,11 +26,9 @@
         editor: editor,
         macroData: widget.data
       }).done(function(data) {
-        console.log('INSERTED/UPDATED', data);
         if (widget && widget.element) {
           widget.setData(data);
         } else {
-          console.log(data);
           var element = CKEDITOR.dom.element.createFromHtml(widget.template.output(), editor.document);
           var wrapper = editor.widgets.wrapElement(element, widget.name);
           var temp = new CKEDITOR.dom.documentFragment(wrapper.getDocument());
@@ -46,10 +44,9 @@
     });
   }
 
-  CKEDITOR.plugins.add('xwiki-image-new', {
+  CKEDITOR.plugins.add('xwiki-image', {
     requires: 'xwiki-image-old',
     init: function(editor) {
-      console.log('INIT');
       this.initImageDialogWidget(editor);
     },
     initImageDialogWidget: function(editor) {
@@ -125,11 +122,11 @@
         }
       };
 
-      var originalShiftState = imageWidget.shiftState;
-      imageWidget.shiftState = function(...args) {
-        originalShiftState(args);
-        console.log('shiwState', args);
-      };
+      // var originalShiftState = imageWidget.shiftState;
+      // imageWidget.shiftState = function(...args) {
+      //   originalShiftState(args);
+      //   console.log('shiwState', args);
+      // };
     }
   });
 })();
